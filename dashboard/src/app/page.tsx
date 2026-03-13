@@ -6,11 +6,12 @@ import SimulationControl from '@/components/SimulationControl';
 import RecommendationsFeed from '@/components/RecommendationsFeed';
 import FeatureIdeationFeed from '@/components/FeatureIdeationFeed';
 import AmlAlertsFeed from '@/components/AmlAlertsFeed';
-import { Sparkles, Zap, LayoutDashboard, Lightbulb, ShieldAlert } from 'lucide-react';
+import VertexFsMetrics from '@/components/VertexFsMetrics';
+import { Sparkles, Zap, LayoutDashboard, Lightbulb, ShieldAlert, Database } from 'lucide-react';
 import clsx from 'clsx';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'recommendations' | 'ideation' | 'aml'>('recommendations');
+  const [activeTab, setActiveTab] = useState<'recommendations' | 'ideation' | 'aml' | 'vertexfs'>('recommendations');
 
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
@@ -22,7 +23,7 @@ export default function Home() {
               <Zap className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-zinc-100 dark:to-zinc-400">
-              Tide<span className="text-indigo-600">FE</span> Dashboard
+              Fin<span className="text-indigo-600">Tech</span> Dashboard
             </h1>
           </div>
           <div className="flex items-center space-x-4">
@@ -78,6 +79,18 @@ export default function Home() {
                      Feature Ideation
                    </button>
                    <button
+                     onClick={() => setActiveTab('vertexfs')}
+                     className={clsx(
+                       "px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center",
+                       activeTab === 'vertexfs' 
+                         ? "bg-white dark:bg-zinc-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                         : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                     )}
+                   >
+                     <Database className="w-4 h-4 mr-1 text-indigo-500" />
+                     Vertex FS
+                   </button>
+                   <button
                      onClick={() => setActiveTab('aml')}
                      className={clsx(
                        "px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center",
@@ -95,6 +108,7 @@ export default function Home() {
                <div className="min-h-[400px]">
                  {activeTab === 'recommendations' && <RecommendationsFeed />}
                  {activeTab === 'ideation' && <FeatureIdeationFeed />}
+                 {activeTab === 'vertexfs' && <VertexFsMetrics />}
                  {activeTab === 'aml' && <AmlAlertsFeed />}
                </div>
             </section>
@@ -133,7 +147,7 @@ export default function Home() {
             
              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl"></div>
-                <h3 className="font-bold text-lg mb-2 relative z-10">Tide FE</h3>
+                <h3 className="font-bold text-lg mb-2 relative z-10">FinTech</h3>
                 <p className="text-indigo-100 text-sm mb-4 relative z-10">
                   Advanced Financial Engineering powered by Google Gemini.
                 </p>

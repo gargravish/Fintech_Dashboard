@@ -1,0 +1,38 @@
+# Core Node Dependencies
+node_modules/
+dashboard/node_modules/
+
+# Next.js Build Output
+dashboard/.next/
+dashboard/out/
+
+# Production builds
+dashboard/build/
+
+# Testing Coverage
+dashboard/coverage/
+
+# Environment Files
+.env
+.env.*
+dashboard/.env*
+
+# Python / bytecode ignores
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Debug Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS-specific
+.DS_Store
+
+# Misc
+dashboard/.vercel
+dashboard/*.tsbuildinfo
+dashboard/next-env.d.ts
+*.pem

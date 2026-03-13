@@ -5,19 +5,19 @@
 --
 -- Prerequisites:
 --   1. Create dataset first (or uncomment the CREATE SCHEMA below)
---   2. Replace `your_project` with your GCP project ID
+--   2. Replace `raves-altostrat` with your GCP project ID
 --   3. Replace `aml_demo_ds` with your dataset name
 -- ============================================================
 
 -- ── Create Dataset (run once) ────────────────────────────────
-CREATE SCHEMA IF NOT EXISTS `your_project.aml_demo_ds`
-OPTIONS (
-    location = 'us',
-    description = 'AML Real-Time Feature Engineering & AI Demo'
-);
+-- CREATE SCHEMA IF NOT EXISTS `raves-altostrat.aml_demo_ds`
+-- OPTIONS (
+--     location = 'us',
+--     description = 'AML Real-Time Feature Engineering & AI Demo'
+-- );
 
 -- ── 1. Raw Transactions Table ────────────────────────────────
-CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.raw_transactions` (
+CREATE TABLE IF NOT EXISTS `raves-altostrat.aml_demo_ds.raw_transactions` (
     transaction_id STRING NOT NULL,
     user_id        STRING NOT NULL,
     amount         FLOAT64,
@@ -37,7 +37,7 @@ OPTIONS (
 -- Sliding-window aggregates supporting AML detection.
 
 -- 15 Minute Aggregates
-CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.user_features_15m` (
+CREATE TABLE IF NOT EXISTS `raves-altostrat.aml_demo_ds.user_features_15m` (
     user_id              STRING NOT NULL,
     tx_count             INT64,
     total_spend          FLOAT64,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.user_features_15m` (
 );
 
 -- 30 Minute Aggregates
-CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.user_features_30m` (
+CREATE TABLE IF NOT EXISTS `raves-altostrat.aml_demo_ds.user_features_30m` (
     user_id              STRING NOT NULL,
     tx_count             INT64,
     total_spend          FLOAT64,
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.user_features_30m` (
 );
 
 -- 60 Minute Aggregates
-CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.user_features_60m` (
+CREATE TABLE IF NOT EXISTS `raves-altostrat.aml_demo_ds.user_features_60m` (
     user_id              STRING NOT NULL,
     tx_count             INT64,
     total_spend          FLOAT64,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.user_features_60m` (
 
 -- ── 3. High-Risk Continuous Queries Landing Alert Table ──────
 -- Populated by Continuous Queries in Checkpoint 6.
-CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.aml_alerts` (
+CREATE TABLE IF NOT EXISTS `raves-altostrat.aml_demo_ds.aml_alerts` (
     transaction_id STRING NOT NULL,
     user_id        STRING NOT NULL,
     alert_type     STRING,
@@ -91,7 +91,7 @@ OPTIONS (
 
 
 -- ── 4. User Recommendations Table (GenAI output) ────────────
-CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.user_recommendations` (
+CREATE TABLE IF NOT EXISTS `raves-altostrat.aml_demo_ds.user_recommendations` (
     user_id        STRING,
     recommendation STRING,
     status STRING,
@@ -101,8 +101,23 @@ CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.user_recommendations` (
 
 
 -- ── 5. Feature Ideation Table (GenAI output) ────────────────
-CREATE TABLE IF NOT EXISTS `your_project.aml_demo_ds.feature_ideation` (
+CREATE TABLE IF NOT EXISTS `raves-altostrat.aml_demo_ds.feature_ideation` (
     source_table      STRING,
     new_feature_ideas STRING,
     generated_at      TIMESTAMP
+);
+
+
+-- ── 6. User 14-Day Baseline Table ──────────────────────────
+-- Holds nightly aggregates synced to Vertex AI Feature Store.
+CREATE TABLE IF NOT EXISTS `raves-altostrat.aml_demo_ds.user_baseline_14d` (  
+    user_id              STRING NOT NULL,  
+    baseline_tx_count    INT64,  
+    baseline_total_spend FLOAT64,  
+    intraday_tx_count    INT64,  
+    intraday_total_spend FLOAT64,  
+    feature_timestamp    TIMESTAMP -- Required for Vertex FS  
+)
+OPTIONS (
+    description = 'Nightly 14-day aggregates synced to Vertex AI Feature Store for millisecond lookups.'
 );

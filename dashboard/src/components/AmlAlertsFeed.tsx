@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { ShieldAlert, AlertCircle, AlertOctagon } from 'lucide-react';
+import { ShieldAlert, AlertCircle, AlertOctagon, Database } from 'lucide-react';
 
 interface AmlAlert {
   transaction_id: string;
@@ -9,6 +9,12 @@ interface AmlAlert {
   alert_type: string;
   amount: number;
   timestamp: { value: string };
+  stats?: {
+     baseline_tx_count: number;
+     baseline_total_spend: number;
+     intraday_tx_count: number;
+     intraday_total_spend: number;
+  }
 }
 
 export default function AmlAlertsFeed() {
@@ -83,9 +89,47 @@ export default function AmlAlertsFeed() {
                   {alert.alert_type}
                 </span>
                 <span className="ml-2 text-xs text-zinc-500">
-                  Continuous Query (Stateless Alert)
+                  Stateless Trigger
                 </span>
               </div>
+
+              {/* Vertex AI Feature Store Breakdown */}
+              {alert.stats && (
+                <div className="mt-3 pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-800 space-y-2">
+                  <div className="flex items-center text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                    <Database className="w-3.5 h-3.5 mr-1" />
+14-Day Vertex AI FS Aggregate Lookup:
+                  </div>
+                  
+                  {(() => {
+                     const bSpend = alert.stats.baseline_total_spend || 0;
+                     const bCount = alert.stats.baseline_tx_count || 0;
+                     const iSpend = alert.stats.intraday_total_spend || 0;
+                     const iCount = alert.stats.intraday_tx_count || 0;
+                     
+                     const totalSpend = bSpend + iSpend;
+                     const totalCount = bCount + iCount;
+                     const avg15d = totalCount > 0 ? totalSpend / totalCount : 0;
+                     const ratio = avg15d > 0 ? alert.amount / avg15d : 0;
+
+                     return (
+                       <div className="grid grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+                         <div>
+                           <span className="text-zinc-400">15-Day Moving Avg:</span> <b className="text-zinc-900 dark:text-zinc-100">£{avg15d.toFixed(2)}</b>
+                         </div>
+                         <div>
+                           <span className="text-zinc-400">Incoming VS Average:</span> <b className={ratio > 2 ? "text-red-500" : "text-emerald-600"}>{ratio.toFixed(1)}x</b>
+                         </div>
+                         <div className="col-span-2 mt-1 bg-zinc-100 dark:bg-zinc-800/80 p-1.5 rounded text-[10px] font-mono flex justify-between">
+                            <span>Batch Sum: £{bSpend.toFixed(0)}</span>
+                            <span className="text-zinc-400">+</span>
+                            <span>Live Intraday: £{iSpend.toFixed(0)}</span>
+                         </div>
+                       </div>
+                     );
+                  })()}
+                </div>
+              )}
             </div>
           </div>
         );
