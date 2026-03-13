@@ -38,4 +38,4 @@ dashboard/*.tsbuildinfo
 dashboard/next-env.d.ts
 *.pem
 genai_output.txt
-planning/*
+planning/
