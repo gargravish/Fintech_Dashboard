@@ -21,6 +21,10 @@ if not os.path.exists(sql_file):
 with open(sql_file, 'r') as f:
     query = f.read()
 
+# Replace placeholders with environment variables
+query = query.replace("${GCP_PROJECT_ID}", os.getenv("GCP_PROJECT_ID", ""))
+query = query.replace("${BQ_DATASET}", os.getenv("BQ_DATASET", ""))
+
 print(f"Executing {sql_file} in project {PROJECT_ID}...")
 client = bigquery.Client(project=PROJECT_ID)
 

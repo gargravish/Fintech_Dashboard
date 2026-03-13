@@ -12,19 +12,19 @@
 --   1. gemini_model created (see 04_remote_model.sql)
 --   2. Tables created with descriptions (see 02_bq_table_setup.sql)
 --
--- Replace: your_project → GCP project ID
---          aml_demo_ds → dataset name
+-- Replace: ${GCP_PROJECT_ID} → GCP project ID
+--          ${BQ_DATASET} → dataset name
 -- ============================================================
 
 -- ── Feature Ideation: What else could we compute? ───────────
-CREATE OR REPLACE TABLE `your_project.aml_demo_ds.feature_ideation` AS
+CREATE OR REPLACE TABLE `${GCP_PROJECT_ID}.${BQ_DATASET}.feature_ideation` AS
 SELECT
     source_table,
     ml_generate_text_llm_result AS new_feature_ideas,
     CURRENT_TIMESTAMP() AS generated_at
 FROM
     ML.GENERATE_TEXT(
-        MODEL `your_project.aml_demo_ds.gemini_model`,
+        MODEL `${GCP_PROJECT_ID}.${BQ_DATASET}.gemini_model`,
         (
             SELECT
                 table_name AS source_table,
@@ -49,7 +49,7 @@ FROM
                     'structuring/smurfing patterns, dormant account reactivation, ',
                     'cross-border transaction sequences, and peer group anomalies.'
                 ) AS prompt
-            FROM `your_project.aml_demo_ds.INFORMATION_SCHEMA.TABLE_OPTIONS`
+            FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.INFORMATION_SCHEMA.TABLE_OPTIONS`
             WHERE table_name = 'raw_transactions'
               AND option_name = 'description'
         ),
@@ -64,4 +64,4 @@ FROM
 -- Preview results:
 -- ============================================================
 -- SELECT source_table, new_feature_ideas
--- FROM `your_project.aml_demo_ds.feature_ideation`;
+-- FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.feature_ideation`;

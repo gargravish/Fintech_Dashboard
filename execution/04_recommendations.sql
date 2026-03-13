@@ -12,12 +12,12 @@
 --   1. gemini_model created (see 04_remote_model.sql)
 --   2. user_features_60m table has data (Dataflow running)
 --
--- Replace: your_project → GCP project ID
---          aml_demo_ds → dataset name
+-- Replace: ${GCP_PROJECT_ID} → GCP project ID
+--          ${BQ_DATASET} → dataset name
 -- ============================================================
 
 -- ── Generate Recommendations ────────────────────────────────
-CREATE OR REPLACE TABLE `your_project.aml_demo_ds.user_recommendations` AS
+CREATE OR REPLACE TABLE `${GCP_PROJECT_ID}.${BQ_DATASET}.user_recommendations` AS
 SELECT
     user_id,
     ml_generate_text_llm_result AS recommendation,
@@ -26,18 +26,18 @@ SELECT
     CURRENT_TIMESTAMP() AS generated_at
 FROM
     ML.GENERATE_TEXT(
-        MODEL `your_project.aml_demo_ds.gemini_model`,
+        MODEL `${GCP_PROJECT_ID}.${BQ_DATASET}.gemini_model`,
         (
             WITH f15 AS (
-                SELECT * FROM `your_project.aml_demo_ds.user_features_15m`
+                SELECT * FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.user_features_15m`
                 QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY last_updated DESC) = 1
             ),
             f30 AS (
-                SELECT * FROM `your_project.aml_demo_ds.user_features_30m`
+                SELECT * FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.user_features_30m`
                 QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY last_updated DESC) = 1
             ),
             f60 AS (
-                SELECT * FROM `your_project.aml_demo_ds.user_features_60m`
+                SELECT * FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.user_features_60m`
                 QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY last_updated DESC) = 1
             )
             SELECT
@@ -80,6 +80,6 @@ FROM
 -- Preview results:
 -- ============================================================
 -- SELECT user_id, recommendation, generated_at
--- FROM `your_project.aml_demo_ds.user_recommendations`
+-- FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.user_recommendations`
 -- ORDER BY generated_at DESC
 -- LIMIT 10;

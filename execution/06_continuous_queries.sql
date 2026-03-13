@@ -9,14 +9,14 @@
 --   1. raw_transactions & aml_alerts tables created (see 02)
 --   2. Continuous Queries enabled (Reservation assignment required in Prod)
 --
--- Replace: your_project → GCP project ID
---          aml_demo_ds → Dataset name
+-- Replace: ${GCP_PROJECT_ID} → GCP project ID
+--          ${BQ_DATASET} → Dataset name
 -- ============================================================
 
 -- ── 1. Create Continuous Query for High-Risk Alerts ──────────
 -- Runs per-row trigger validation as transactions stream in.
 
-INSERT INTO `your_project.aml_demo_ds.aml_alerts`
+INSERT INTO `${GCP_PROJECT_ID}.${BQ_DATASET}.aml_alerts`
     (transaction_id, user_id, alert_type, amount, timestamp)
 SELECT
     transaction_id,
@@ -29,7 +29,7 @@ SELECT
     amount,
     CURRENT_TIMESTAMP() AS timestamp
 FROM
-    APPENDS(TABLE `your_project.aml_demo_ds.raw_transactions`, NULL, NULL)
+    APPENDS(TABLE `${GCP_PROJECT_ID}.${BQ_DATASET}.raw_transactions`, NULL, NULL)
 WHERE
     amount >= 50000
     OR country IN ('FR', 'FRANCE');
@@ -45,7 +45,7 @@ WHERE
 --     ml_generate_text_llm_result AS instant_risk_assessment
 -- FROM 
 --     ML.GENERATE_TEXT(
---         MODEL `your_project.aml_demo_ds.gemini_model`,
+--         MODEL `${GCP_PROJECT_ID}.${BQ_DATASET}.gemini_model`,
 --         (
 --             SELECT 
 --                 transaction_id,
@@ -57,7 +57,7 @@ WHERE
 --                     'Country: ', country
 --                 ) AS prompt
 --             FROM 
---                 `your_project.aml_demo_ds.raw_transactions`
+--                 `${GCP_PROJECT_ID}.${BQ_DATASET}.raw_transactions`
 --         ),
 --         STRUCT(
 --             128 AS max_output_tokens,

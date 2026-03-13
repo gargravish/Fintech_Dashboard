@@ -4,7 +4,7 @@
 
 -- 1. Check if raw_transactions has a description (used for Feature Ideation)
 SELECT table_name, option_name, option_value
-FROM `raves-altostrat.aml_demo_ds.INFORMATION_SCHEMA.TABLE_OPTIONS`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.INFORMATION_SCHEMA.TABLE_OPTIONS`
 WHERE table_name = 'raw_transactions'
   AND option_name = 'description';
 
@@ -16,7 +16,7 @@ SELECT
     JSON_VALUE(ml_generate_text_llm_result, '$.candidates[0].content.parts[0].text') AS parsed_text
 FROM
     ML.GENERATE_TEXT(
-        MODEL `raves-altostrat.aml_demo_ds.gemini_model`,
+        MODEL `${GCP_PROJECT_ID}.${BQ_DATASET}.gemini_model`,
         (
             SELECT 'user_123' as user_id, 'Provide a financial tip.' as prompt
         ),

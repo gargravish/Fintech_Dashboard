@@ -23,6 +23,7 @@ __pycache__/
 *$py.class
 
 # Debug Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -36,3 +37,5 @@ dashboard/.vercel
 dashboard/*.tsbuildinfo
 dashboard/next-env.d.ts
 *.pem
+genai_output.txt
+planning/*

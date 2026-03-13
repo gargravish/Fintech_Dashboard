@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PROJECT_ID = "raves-altostrat"
+PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 DATASET_ID = "aml_demo_ds"
 client = bigquery.Client(project=PROJECT_ID)
 

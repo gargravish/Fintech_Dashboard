@@ -1,9 +1,11 @@
 from google.cloud import bigquery
 import os
 import time
+from dotenv import load_dotenv
+load_dotenv()
 
-PROJECT_ID = "raves-altostrat"
-DATASET_ID = "aml_demo_ds"
+PROJECT_ID = os.getenv("GCP_PROJECT_ID")
+DATASET_ID = os.getenv("BQ_DATASET", "aml_demo_ds")
 client = bigquery.Client(project=PROJECT_ID)
 
 def run_sql_file(file_path):

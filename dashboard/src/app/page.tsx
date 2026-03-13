@@ -152,7 +152,7 @@ export default function Home() {
                   Advanced Financial Engineering powered by Google Gemini.
                 </p>
                 <div className="text-xs font-mono bg-black/20 rounded p-2 relative z-10">
-                  Project: raves-altostrat
+                  Project: {process.env.NEXT_PUBLIC_GCP_PROJECT_ID || 'Demo'}
                 </div>
             </div>
           </div>

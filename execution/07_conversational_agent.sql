@@ -34,21 +34,21 @@
 -- ── Query 1: "Who are the top spenders in the last hour?" ────
 -- Expected generated SQL:
 SELECT user_id, total_spend_1h, tx_count_1h
-FROM `your_project.aml_demo_ds.user_features`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.user_features`
 ORDER BY total_spend_1h DESC
 LIMIT 10;
 
 -- ── Query 2: "Show me users with transactions in multiple countries" ──
 -- Expected generated SQL:
 SELECT user_id, distinct_countries_1h, total_spend_1h, tx_count_1h
-FROM `your_project.aml_demo_ds.user_features`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.user_features`
 WHERE distinct_countries_1h > 1
 ORDER BY distinct_countries_1h DESC;
 
 -- ── Query 3: "What AML recommendations were generated?" ─────
 -- Expected generated SQL:
 SELECT user_id, recommendation, generated_at
-FROM `your_project.aml_demo_ds.user_recommendations`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.user_recommendations`
 ORDER BY generated_at DESC
 LIMIT 10;
 
@@ -64,14 +64,14 @@ SELECT
         WHEN total_spend_1h > 2000 OR tx_count_1h > 20 THEN 'MEDIUM RISK'
         ELSE 'LOW RISK'
     END AS risk_level
-FROM `your_project.aml_demo_ds.user_features`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.user_features`
 QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY last_updated DESC) = 1
 ORDER BY total_spend_1h DESC;
 
 -- ── Query 5: "What new features were suggested by AI?" ──────
 -- Expected generated SQL:
 SELECT source_table, new_feature_ideas
-FROM `your_project.aml_demo_ds.feature_ideation`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.feature_ideation`
 ORDER BY generated_at DESC
 LIMIT 5;
 
@@ -83,7 +83,7 @@ SELECT
     SUM(amount) AS total_amount,
     AVG(amount) AS avg_amount,
     COUNT(DISTINCT user_id) AS unique_users
-FROM `your_project.aml_demo_ds.raw_transactions`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.raw_transactions`
 WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)
 GROUP BY category
 ORDER BY total_amount DESC;

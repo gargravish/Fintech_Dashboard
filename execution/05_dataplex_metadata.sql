@@ -7,8 +7,8 @@
 -- HOW TO RUN:
 --   Copy-paste into BigQuery Console → Run.
 --
--- Replace: your_project → GCP project ID
---          aml_demo_ds → dataset name
+-- Replace: ${GCP_PROJECT_ID} → GCP project ID
+--          ${BQ_DATASET} → dataset name
 -- ============================================================
 
 -- ── View Table Metadata (Dataplex-enriched) ─────────────────
@@ -19,7 +19,7 @@ SELECT
     table_name,
     option_name,
     option_value AS description
-FROM `your_project.aml_demo_ds.INFORMATION_SCHEMA.TABLE_OPTIONS`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.INFORMATION_SCHEMA.TABLE_OPTIONS`
 WHERE option_name = 'description'
 ORDER BY table_name;
 
@@ -32,7 +32,7 @@ SELECT
     data_type,
     is_nullable,
     ordinal_position
-FROM `your_project.aml_demo_ds.INFORMATION_SCHEMA.COLUMNS`
+FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.INFORMATION_SCHEMA.COLUMNS`
 ORDER BY table_name, ordinal_position;
 
 
@@ -44,7 +44,7 @@ SELECT
     ml_generate_text_result['candidates'][0]['content']['parts'][0]['text'] AS grounded_feature_ideas
 FROM
     ML.GENERATE_TEXT(
-        MODEL `your_project.aml_demo_ds.gemini_model`,
+        MODEL `${GCP_PROJECT_ID}.${BQ_DATASET}.gemini_model`,
         (
             SELECT
                 CONCAT(
@@ -57,13 +57,13 @@ FROM
                                ' | Type: ', data_type),
                         '\n'
                     )
-                    FROM `your_project.aml_demo_ds.INFORMATION_SCHEMA.COLUMNS`),
+                    FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.INFORMATION_SCHEMA.COLUMNS`),
                     '\n\n--- Table Descriptions ---\n',
                     (SELECT STRING_AGG(
                         CONCAT('Table: ', table_name, ' | Description: ', option_value),
                         '\n'
                     )
-                    FROM `your_project.aml_demo_ds.INFORMATION_SCHEMA.TABLE_OPTIONS`
+                    FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.INFORMATION_SCHEMA.TABLE_OPTIONS`
                     WHERE option_name = 'description'),
                     '\n\nBased on this complete schema and metadata context, suggest ',
                     '3 advanced SQL continuous queries that could be added to enhance ',

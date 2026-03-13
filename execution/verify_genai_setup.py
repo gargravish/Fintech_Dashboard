@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PROJECT_ID = "raves-altostrat" # User specified
-DATASET_ID = "aml_demo_ds"
+PROJECT_ID = os.getenv("GCP_PROJECT_ID") # User specified
+DATASET_ID = os.getenv("BQ_DATASET", "aml_demo_ds")
 client = bigquery.Client(project=PROJECT_ID)
 
 def check_table_description():

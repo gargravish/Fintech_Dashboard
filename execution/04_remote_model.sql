@@ -14,7 +14,7 @@
 --              vertex-ai-connection → your connection name
 -- ============================================================
 
-CREATE OR REPLACE MODEL `your_project.aml_demo_ds.gemini_model`
+CREATE OR REPLACE MODEL `${GCP_PROJECT_ID}.${BQ_DATASET}.gemini_model`
 REMOTE WITH CONNECTION `projects/your-project/locations/us/connections/vertex-ai-connection`
 OPTIONS (
     ENDPOINT = 'gemini-2.5-flash'
@@ -23,4 +23,4 @@ OPTIONS (
 -- ============================================================
 -- Verify the model was created:
 -- ============================================================
--- SELECT * FROM `your_project.aml_demo_ds.INFORMATION_SCHEMA.MODELS`;
+-- SELECT * FROM `${GCP_PROJECT_ID}.${BQ_DATASET}.INFORMATION_SCHEMA.MODELS`;

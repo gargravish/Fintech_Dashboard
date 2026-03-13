@@ -61,8 +61,8 @@ def format_bq(element):
 load_dotenv()
 
 # Define input/output
-INPUT_TOPIC = "projects/raves-altostrat/topics/aml-demo"
-OUTPUT_TABLE = "raves-altostrat:aml_demo_ds.user_features"
+INPUT_TOPIC = "projects/your-project-id/topics/aml-demo"
+OUTPUT_TABLE = "your-project-id:your_dataset.user_features"
 
 class ParseTransaction(DoFn):
     def process(self, element):
