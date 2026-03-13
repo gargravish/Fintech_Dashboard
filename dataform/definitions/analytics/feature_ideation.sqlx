@@ -1,0 +1,50 @@
+-- Feature Ideation: AI-driven discovery of new AML features
+-- Uses table metadata to prompt Gemini for novel feature ideas
+config {
+    type: "table",
+    schema: "aml_demo_ds",
+    name: "feature_ideation",
+    description: "Gemini-suggested new predictive features for AML/fraud detection, generated using Dataplex-enriched table metadata as context.",
+    tags: ["aml", "genai", "analytics", "dataplex"],
+    dependencies: ["raw_transactions"]
+}
+
+SELECT
+    source_table,
+    ml_generate_text_result['candidates'][0]['content']['parts'][0]['text'] AS new_feature_ideas,
+    CURRENT_TIMESTAMP() AS generated_at
+FROM
+    ML.GENERATE_TEXT(
+        MODEL `your-project-id.aml_demo_ds.gemini_model`,
+        (
+            SELECT
+                table_name AS source_table,
+                CONCAT(
+                    'You are a senior data scientist specializing in AML (Anti-Money Laundering) ',
+                    'and financial fraud detection. Analyze the following BigQuery table metadata ',
+                    'and suggest 5-7 NEW predictive features that could be engineered.\n\n',
+                    'For each feature, provide:\n',
+                    '- Feature name\n',
+                    '- SQL expression or logic\n',
+                    '- Why it is useful for AML/fraud detection\n\n',
+                    '--- Table Metadata ---\n',
+                    'Table: ', table_name, '\n',
+                    'Description: ', IFNULL(CAST(option_value AS STRING), 'N/A'), '\n',
+                    'Existing columns: transaction_id, user_id, amount, timestamp, ',
+                    'merchant, category, currency, country\n',
+                    'Existing features: tx_count_1h, total_spend_1h, avg_amount_1h, ',
+                    'distinct_merchants_1h, distinct_countries_1h, max_amount_1h\n\n',
+                    'Focus on: time-of-day patterns, velocity changes, round-amount detection, ',
+                    'structuring/smurfing patterns, dormant account reactivation, ',
+                    'cross-border transaction sequences.'
+                ) AS prompt
+            FROM `your-project-id.aml_demo_ds.INFORMATION_SCHEMA.TABLE_OPTIONS`
+            WHERE table_name = 'raw_transactions'
+              AND option_name = 'description'
+        ),
+        STRUCT(
+            1024 AS max_output_tokens,
+            0.5 AS temperature,
+            TRUE AS flatten_json_output
+        )
+    )

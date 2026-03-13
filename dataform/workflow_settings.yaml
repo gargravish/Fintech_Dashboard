@@ -1,0 +1,4 @@
+defaultProject: your-project-id
+defaultDataset: aml_demo_ds
+defaultLocation: us
+assertionSchema: aml_demo_ds_assertions

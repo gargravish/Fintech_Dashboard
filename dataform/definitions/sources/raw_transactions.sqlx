@@ -1,0 +1,9 @@
+-- Source declaration for the raw transactions table
+-- This table is populated by the Managed Kafka → BigQuery Sink Connector
+config {
+    type: "declaration",
+    database: "your-project-id",
+    schema: "aml_demo_ds",
+    name: "raw_transactions",
+    description: "Raw financial transactions ingested from Managed Kafka. Source of truth for all downstream feature engineering."
+}

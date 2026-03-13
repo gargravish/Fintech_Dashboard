@@ -1,0 +1,7 @@
+# AML Real-Time Demo — Python Dependencies
+google-cloud-pubsub
+apache-beam[gcp]>=2.18.0
+google-cloud-bigquery>=3.25.0
+google-cloud-dataplex>=2.0.0
+python-dotenv>=1.0.0
+faker>=28.0.0

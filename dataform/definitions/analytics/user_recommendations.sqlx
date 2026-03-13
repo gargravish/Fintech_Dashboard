@@ -1,0 +1,43 @@
+-- User Recommendations: GenAI-powered financial advice and risk assessment
+-- Uses ML.GENERATE_TEXT with Gemini to analyze spending patterns
+config {
+    type: "table",
+    schema: "aml_demo_ds",
+    name: "user_recommendations",
+    description: "AI-generated personalized financial recommendations and AML risk assessments per user. Powered by Gemini via BQML ML.GENERATE_TEXT.",
+    tags: ["aml", "genai", "analytics"],
+    dependencies: ["user_features"]
+}
+
+SELECT
+    user_id,
+    ml_generate_text_result['candidates'][0]['content']['parts'][0]['text'] AS recommendation,
+    CURRENT_TIMESTAMP() AS generated_at
+FROM
+    ML.GENERATE_TEXT(
+        MODEL `your-project-id.aml_demo_ds.gemini_model`,
+        (
+            SELECT
+                user_id,
+                CONCAT(
+                    'You are a financial advisor AI for an AML compliance platform. ',
+                    'Based on the following real-time spending patterns, provide: ',
+                    '1) A risk assessment (LOW/MEDIUM/HIGH) with reasoning, ',
+                    '2) A personalized savings tip or product recommendation, ',
+                    '3) Any AML red flags if applicable.\n\n',
+                    'User: ', user_id, '\n',
+                    'Transactions in last hour: ', CAST(tx_count_1h AS STRING), '\n',
+                    'Total spend in last hour: £', CAST(ROUND(total_spend_1h, 2) AS STRING), '\n',
+                    'Average transaction: £', CAST(ROUND(avg_amount_1h, 2) AS STRING), '\n',
+                    'Distinct merchants: ', CAST(distinct_merchants_1h AS STRING), '\n',
+                    'Distinct countries: ', CAST(distinct_countries_1h AS STRING), '\n',
+                    'Max single transaction: £', CAST(ROUND(max_amount_1h, 2) AS STRING)
+                ) AS prompt
+            FROM ${ref("user_features")}
+        ),
+        STRUCT(
+            256 AS max_output_tokens,
+            0.3 AS temperature,
+            TRUE AS flatten_json_output
+        )
+    )
