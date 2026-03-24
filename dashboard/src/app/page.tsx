@@ -7,11 +7,12 @@ import RecommendationsFeed from '@/components/RecommendationsFeed';
 import FeatureIdeationFeed from '@/components/FeatureIdeationFeed';
 import AmlAlertsFeed from '@/components/AmlAlertsFeed';
 import VertexFsMetrics from '@/components/VertexFsMetrics';
-import { Sparkles, Zap, LayoutDashboard, Lightbulb, ShieldAlert, Database } from 'lucide-react';
+import AmlNetworkGraph from '@/components/AmlNetworkGraph';
+import { Sparkles, Zap, LayoutDashboard, Lightbulb, ShieldAlert, Database, Network } from 'lucide-react';
 import clsx from 'clsx';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'recommendations' | 'ideation' | 'aml' | 'vertexfs'>('recommendations');
+  const [activeTab, setActiveTab] = useState<'recommendations' | 'ideation' | 'aml' | 'vertexfs' | 'graph'>('recommendations');
 
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
@@ -102,6 +103,18 @@ export default function Home() {
                      <ShieldAlert className="w-4 h-4 mr-1 text-red-500" />
                      AML Alerts
                    </button>
+                   <button
+                     onClick={() => setActiveTab('graph')}
+                     className={clsx(
+                       "px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center",
+                       activeTab === 'graph' 
+                         ? "bg-white dark:bg-zinc-700 text-purple-600 dark:text-purple-400 shadow-sm" 
+                         : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                     )}
+                   >
+                     <Network className="w-4 h-4 mr-1 text-purple-500" />
+                     Network Graph
+                   </button>
                  </div>
                </div>
                
@@ -110,6 +123,7 @@ export default function Home() {
                  {activeTab === 'ideation' && <FeatureIdeationFeed />}
                  {activeTab === 'vertexfs' && <VertexFsMetrics />}
                  {activeTab === 'aml' && <AmlAlertsFeed />}
+                 {activeTab === 'graph' && <AmlNetworkGraph />}
                </div>
             </section>
           </div>

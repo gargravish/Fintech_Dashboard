@@ -13,6 +13,13 @@ graph LR
     F -->|Schema Context| G["AI Feature<br/>Ideation"]
     D --> H["Next.js<br/>Dashboard"]
     
+    %% BigQuery Graph Integration
+    R -->|Graph Nodes and Edges| GRAPH["BigQuery Property Graph<br/>(Knowledge Graph & Topologies)"]
+    GRAPH -->|Concurrent GQL Patterns| G_API["Graph API Processing<br/>(Layering, Smurfing, UBO, Circular)"]
+    G_API -->|Interactive Subgraphs| H
+    G_API -->|Dynamic Topology Prompting| GEM["Vertex AI Gemini<br/>(Contextual Anomaly Summaries)"]
+    GEM -->|AI Inference Fallbacks| H
+    
     %% Vertex AI Dual Feature View Path
     R -->|14d Batch Aggregate| V_BQ["BigQuery<br/>user_baseline_14d"]
     V_BQ -->|Sync| V_FS_B["Vertex FS<br/>baseline_14d_view"]
@@ -38,6 +45,9 @@ graph LR
     style V_FS_I fill:#FBBC04,color:#000
     style V_DF fill:#FF6D00,color:#fff
     style V_INF fill:#4285F4,color:#fff
+    style GRAPH fill:#9334E6,color:#fff
+    style G_API fill:#4285F4,color:#fff
+    style GEM fill:#FBBC04,color:#000
 ```
 
 ## Quick Start
@@ -76,6 +86,8 @@ cp .env.example .env
 | **CP9** | Provision Feature Store | `python execution/08_vertex_fs_setup_rest.py` |
 | **CP9** | Start DirectWrite Stream | `python execution/09_dataflow_directwrite.py` |
 | **CP10** | Start Inference API | `uvicorn execution.10_inference_api:app --port 8080` |
+| **CP11** | Setup BQ Graph | Copy `execution/12_bq_graph_setup.sql` → BQ Console |
+| **CP11** | Test AML Graph Patterns | Copy `execution/13_bq_graph_queries.sql` → BQ Console |
 ## Dashboard & UI
 
 This project includes a Next.js frontend dashboard to visualize the real-time feature engineering and AI recommendations.
@@ -107,6 +119,12 @@ The dashboard includes a **"Simulate" button** to generate synthetic transaction
 
 * **Features:** Transaction features (e.g., `tx_count`, `total_spend`, `avg_amount`, `max_amount`) are calculated in real-time by the Dataflow Direct-Runner Pipeline. The pipeline uses Sliding Windows (15m, 30m, 60m) to aggregate the incoming Pub/Sub stream and writes the metrics into BigQuery (`user_features_15m`, `user_features_30m`, `user_features_60m`).
 * **Recommendations & Ideations:** These are generated inside BigQuery using GenAI. Specifically, BigQuery ML's `ML.GENERATE_TEXT` function calls a connected Vertex AI Gemini model to analyze the aggregated features and produce personalized financial recommendations and AML risk assessments.
+* **BigQuery Knowledge Graph (AML detection):** Structured transaction flows and unstructured KYC entity extractions are dynamically bound together natively using `CREATE PROPERTY GRAPH`. The backend concurrently executes 4 massive multi-hop GQL queries to identify complex structural money laundering patterns:
+  - **Multi-Hop Layering**: Sequential rapid transfers breaking standard trailing limits.
+  - **Circular Assets**: Funds routing through intermediary proxies back to the originating entity.
+  - **Structuring / Smurfing**: Sub-threshold ($9,000-$9,900) repetitive transfers funneled to blind sink accounts.
+  - **UBO Risk**: Retail transfers mapping upstream to corporate shell accounts explicitly owned by High-Risk Entities.
+  The Next.js dashboard visualizes these anomalies actively as interactive sub-graphs. Clicking onto anomalous hubs will retrieve exact transaction tables and run **Vertex AI Gemini** generative models dynamically against the subgraph topologies, classifying the explicit suspicion type based completely on context.
 
 ### Hybrid Lambda Architecture with Vertex AI Feature Store
 
@@ -146,7 +164,9 @@ Tide_FE/
 │   ├── 08_vertex_fs_setup_rest.py # [NEW] REST script for Feature Store Setup
 │   ├── 08_batch_baseline.sql     # [NEW] 14d Batch Baseline aggregate insertion SQL
 │   ├── 09_dataflow_directwrite.py # [NEW] streaming Dataflow DirectWrite
-│   └── 10_inference_api.py       # [NEW] FastAPI Endpoint serving fetchFeatureValues
+│   ├── 10_inference_api.py       # [NEW] FastAPI Endpoint serving fetchFeatureValues
+│   ├── 12_bq_graph_setup.sql     # [NEW] Property Graph initialization script
+│   └── 13_bq_graph_queries.sql   # [NEW] GQL queries for AML topologies
 │
 ├── dataform/                     # Dataform workflow (deploy to BQ)
 │   ├── workflow_settings.yaml
@@ -176,3 +196,4 @@ Tide_FE/
 | **Dataplex Universal Catalog** | Metadata governance & AI grounding |
 | **Dataform** | SQL workflow orchestration |
 | **BQ Conversational Agent** | Natural language analytics |
+| **BigQuery Graph Engine** | (Private Preview) multi-hop GQL analysis, bridging structured tables with unstructured extractions |
